@@ -1,0 +1,6 @@
+# 首先检查当前远程仓库URL
+git remote -v
+
+# 如果是 HTTPS，改为 SSH（假设你的仓库在 GitHub）
+git remote set-url origin git@github.com:用户名/仓库名.git
+git push -u origin main 

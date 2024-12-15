@@ -1,0 +1,71 @@
+private boolean isRequestMessageValid(FluxRequestParam fluxRequestParam) {
+        Integer totalTokenNum = chatGptTokenService.getTotalTokenNum(MultiModalMessage.toNormalMessage(fluxRequestParam.getMessages()), fluxRequestParam.getModelType());
+        return !chatGptTokenService.validMaxToken(fluxRequestParam.getModelType(), totalTokenNum);
+    }
+
+    @VisibleForTesting
+    protected Flux<String> requestGptByStreamHelper(AtomicInteger retryTimes, StringBuilder cutoffContent, boolean mergeCode,
+                                                    FluxRequestParam fluxRequestParam, ReportRequestParam reportRequestParam,
+                                                    PluginInterResponse pluginInterResponse, boolean autoChat) {
+        Transaction transaction = Cat.newTransaction("chatgpt", "stream-http");
+
+        // 按照模型配置属性进行参数适配，直接去对原属性进行修改
+        adapterGptRequestBodyBefore(fluxRequestParam);
+
+        // 深拷贝
+        FluxRequestParam fluxRequestParamNew = deepCopy(fluxRequestParam);
+        ReportRequestParam reportRequestParamNew = JSONUtil.toBean(JSONUtil.toJsonStr(reportRequestParam), ReportRequestParam.class);
+        PluginInterResponse pluginInterResponseNew = JSONUtil.toBean(JSONUtil.toJsonStr(pluginInterResponse), PluginInterResponse.class);
+
+        // TODO @shuai：【代码治理】这块，我们要一起看看，怎么把 ModelType.MC_UT_16K 特殊判断去掉
+        if (retryTimes.get() > 0 && ModelType.MC_UT_16K.equals(fluxRequestParamNew.getModelType())) {
+            fluxRequestParamNew.setModelType(ModelType.gpt4_0125);
+        }
+        try {
+            long startTime = System.currentTimeMillis();
+            reportRequestParamNew.setStarTime(startTime);
+            ModelType modelType = fluxRequestParamNew.getModelType();
+            String traceId = reportRequestParamNew.getTraceId();
+            ReportRequestResponseDO reportRequestResponseDO = ReportRequestResponseContext.get();
+            GptRequestModel requestModel = getRequestModelAndCat(reportRequestResponseDO, fluxRequestParam, fluxRequestParamNew, modelType, retryTimes, traceId);
+            TokenNum tokenNum = new TokenNum();
+            return chatGptWebClient.post()
+                    .uri(requestModel.getUrl())
+                    .accept(MediaType.ALL)
+                    .acceptCharset(StandardCharsets.UTF_8)
+                    .header("Authorization", "Bearer " + requestModel.getAuthorizationToken())
+                    .header(FieldType.TraceId.getName(), Tracer.id())
+                    .header(FieldType.SpanId.getName(), Tracer.getSpanId())
+                    .header(FieldType.Appkey.getName(), AppUtils.getAppKey())
+                    .body(BodyInserters.fromObject(requestModel.getData()))
+                    .exchange()
+                    .timeout(Duration.ofSeconds(modelType == ModelType.MC_UT_16K ? mTForUtTimeOut : 5 * 60))
+//                    .timeout(Duration.ofMillis(10)) // 可用于测试 TimeoutException 异常
+                    .onErrorResume(e -> !(modelType == ModelType.MC_UT_16K && TriggerMode.isUnitTestTriggerMode(fluxRequestParamNew.getQueryDO())), e -> handleFLuxException(retryTimes, fluxRequestParamNew, reportRequestParamNew, modelType, traceId, e, pluginInterResponseNew))
+                    .doOnCancel(() -> {
+                        log.info("traceId={} doOnCancel", traceId);
+                        Long pluginId = extractPluginId(pluginInterResponseNew);
+                        reportDoneMsg(retryTimes, reportRequestParamNew, fluxRequestParamNew, new TokenNum(), pluginId, FluxStatus.SERVER_STOP);
+                    })
+                    .doOnDiscard(Void.class, o -> log.warn("traceId={} doOnDiscard", traceId))
+                    .doOnTerminate(() -> {
+                        log.info("traceId={} doOnTerminate,doOnTerminate,doOnTerminate", traceId);
+                    })
+                    .doFinally(a -> {
+                        log.info("traceId={} doFinally,doFinally,doFinally, type={}", traceId, a);
+                    })
+                    .doOnSuccess(a -> onSuccess(startTime, modelType, tokenNum))
+                    .flatMapMany(res -> handleFluxDataStream(retryTimes, cutoffContent, mergeCode, fluxRequestParamNew, reportRequestParamNew, modelType, traceId, res, pluginInterResponseNew, autoChat, tokenNum))
+                    .onErrorResume(e -> (modelType == ModelType.MC_UT_16K && TriggerMode.isUnitTestTriggerMode(fluxRequestParamNew.getQueryDO())), e -> handleMTForUtFLuxException(retryTimes, fluxRequestParamNew, reportRequestParamNew, modelType, traceId, e, pluginInterResponseNew, mergeCode))
+                    .doOnNext((modelResponseJson) -> reportModelResponse(reportRequestResponseDO, retryTimes, modelResponseJson, reportRequestParamNew, fluxRequestParamNew));
+        } catch (Exception e) {
+            log.error("requestStream exception", e);
+            transaction.setStatus(e);
+//            reportErrorMsg(promptDO, queryDO, clientUuid, suggestUuid, null, modelType, traceId, FluxStatus.SERVER_ERROR);
+            Long pluginId = extractPluginId(pluginInterResponseNew);
+            reportErrorMsg(retryTimes, reportRequestParamNew, fluxRequestParamNew.getQueryDO(), fluxRequestParamNew.getPromptId(), fluxRequestParamNew.getModelType(), FluxStatus.SERVER_ERROR, pluginId);
+            return Flux.just(GptResponse.failJson(FluxStatus.SERVER_ERROR));
+        } finally {
+            transaction.complete();
+        }
+    }

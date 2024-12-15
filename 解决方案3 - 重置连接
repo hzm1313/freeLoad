@@ -1,0 +1,7 @@
+# 强制终止当前的 git 进程
+killall git
+
+# 清理并重试
+git gc
+git repack -a -d
+git push -u origin main 
