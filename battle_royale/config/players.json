@@ -1,0 +1,284 @@
+[
+    {
+        "name": "张三",
+        "age": 25,
+        "occupation": "大学生",
+        "background": "体育系学生，擅长各项运动"
+    },
+    {
+        "name": "李四",
+        "age": 30,
+        "occupation": "警察",
+        "background": "退伍特种兵，格斗专家"
+    },
+    {
+        "name": "王五",
+        "age": 28,
+        "occupation": "医生",
+        "background": "急诊科医生，临床经验丰富"
+    },
+    {
+        "name": "赵六",
+        "age": 35,
+        "occupation": "猎人",
+        "background": "职业猎人，精通野外生存"
+    },
+    {
+        "name": "陈七",
+        "age": 22,
+        "occupation": "跑酷运动员",
+        "background": "城市跑酷达人，身手敏捷"
+    },
+    {
+        "name": "刘八",
+        "age": 45,
+        "occupation": "厨师",
+        "background": "米其林三星主厨，对食材了如指掌"
+    },
+    {
+        "name": "孙九",
+        "age": 27,
+        "occupation": "程序员",
+        "background": "黑客高手，精通电子设备"
+    },
+    {
+        "name": "周十",
+        "age": 32,
+        "occupation": "消防员",
+        "background": "救火英雄，体能出众"
+    },
+    {
+        "name": "吴一一",
+        "age": 29,
+        "occupation": "武术教练",
+        "background": "少林寺出身，精通各种武术"
+    },
+    {
+        "name": "郑一二",
+        "age": 24,
+        "occupation": "化学研究生",
+        "background": "化学天才，擅长制作各种药剂"
+    },
+    {
+        "name": "王一三",
+        "age": 38,
+        "occupation": "登山家",
+        "background": "攀登过珠穆朗玛峰，适应力强"
+    },
+    {
+        "name": "李一四",
+        "age": 26,
+        "occupation": "游泳运动员",
+        "background": "奥运会选手，水性极佳"
+    },
+    {
+        "name": "赵一五",
+        "age": 33,
+        "occupation": "野外生存专家",
+        "background": "荒野求生节目主持人，求生技能丰富"
+    },
+    {
+        "name": "钱一六",
+        "age": 28,
+        "occupation": "格斗教练",
+        "background": "综合格斗冠军，战斗经验丰富"
+    },
+    {
+        "name": "孙一七",
+        "age": 31,
+        "occupation": "特技演员",
+        "background": "好莱坞特技演员，身手矫健"
+    },
+    {
+        "name": "周一八",
+        "age": 29,
+        "occupation": "营养师",
+        "background": "运动队营养师，了解身体机能"
+    },
+    {
+        "name": "吴一九",
+        "age": 34,
+        "occupation": "侦探",
+        "background": "前刑警，擅长推理和追踪"
+    },
+    {
+        "name": "郑二十",
+        "age": 27,
+        "occupation": "机械工程师",
+        "background": "军工企业工程师，精通机械"
+    },
+    {
+        "name": "马二一",
+        "age": 25,
+        "occupation": "电子竞技选手",
+        "background": "职业选手，反应速度惊人"
+    },
+    {
+        "name": "胡二二",
+        "age": 36,
+        "occupation": "心理医生",
+        "background": "犯罪心理专家，善于分析人性"
+    },
+    {
+        "name": "林二三",
+        "age": 30,
+        "occupation": "调酒师",
+        "background": "世界调酒冠军，精通各种化学配比"
+    },
+    {
+        "name": "朱二四",
+        "age": 28,
+        "occupation": "魔术师",
+        "background": "街头魔术师，手法灵巧"
+    },
+    {
+        "name": "汪二五",
+        "age": 32,
+        "occupation": "兽医",
+        "background": "野生动物专家，了解动物习性"
+    },
+    {
+        "name": "沈二六",
+        "age": 29,
+        "occupation": "瑜伽教练",
+        "background": "前杂技演员，身体柔韧性极强"
+    },
+    {
+        "name": "韩二七",
+        "age": 31,
+        "occupation": "摄影师",
+        "background": "战地记者，经历过多次危险"
+    },
+    {
+        "name": "蒋二八",
+        "age": 33,
+        "occupation": "爆破专家",
+        "background": "前拆弹小组组长，精通各种炸药"
+    },
+    {
+        "name": "秦二九",
+        "age": 29,
+        "occupation": "攀岩教练",
+        "background": "自由攀岩高手，对高空环境适应极强"
+    },
+    {
+        "name": "余三十",
+        "age": 26,
+        "occupation": "赛车手",
+        "background": "F1赛车手，反应神经极快"
+    },
+    {
+        "name": "陆三一",
+        "age": 34,
+        "occupation": "潜水员",
+        "background": "深海救援队成员，水下作业专家"
+    },
+    {
+        "name": "范三二",
+        "age": 31,
+        "occupation": "气象学家",
+        "background": "极地考察队成员，善于预测天气变化"
+    },
+    {
+        "name": "方三三",
+        "age": 28,
+        "occupation": "滑雪教练",
+        "background": "冬奥会选手，擅长极限运动"
+    },
+    {
+        "name": "田三四",
+        "age": 37,
+        "occupation": "植物学家",
+        "background": "热带雨林研究专家，精通各种植物"
+    },
+    {
+        "name": "高三五",
+        "age": 30,
+        "occupation": "密室逃脱设计师",
+        "background": "解谜专家，思维缜密"
+    },
+    {
+        "name": "傅三六",
+        "age": 32,
+        "occupation": "声学工程师",
+        "background": "军方声纳专家，听觉异常敏锐"
+    },
+    {
+        "name": "白三七",
+        "age": 29,
+        "occupation": "营地教官",
+        "background": "青少年野外训练营总教官，经验丰富"
+    },
+    {
+        "name": "江三八",
+        "age": 35,
+        "occupation": "航海家",
+        "background": "独自环球航海，具备丰富航海经验"
+    },
+    {
+        "name": "梁三九",
+        "age": 27,
+        "occupation": "射击教练",
+        "background": "前国家队射击运动员，枪法精准"
+    },
+    {
+        "name": "谢四十",
+        "age": 33,
+        "occupation": "防毒专家",
+        "background": "生化实验室安全主管，熟悉各种毒素"
+    },
+    {
+        "name": "邓四一",
+        "age": 31,
+        "occupation": "越野车手",
+        "background": "达喀尔拉力赛车手，野外驾驶技术一流"
+    },
+    {
+        "name": "杜四二",
+        "age": 29,
+        "occupation": "电工",
+        "background": "高压电维修专家，对电路系统了如指掌"
+    },
+    {
+        "name": "丁四三",
+        "age": 34,
+        "occupation": "地质学家",
+        "background": "洞穴探险专家，熟悉各种地形"
+    },
+    {
+        "name": "薛四四",
+        "age": 28,
+        "occupation": "气功师",
+        "background": "武当山传人，内功深厚"
+    },
+    {
+        "name": "严四五",
+        "age": 32,
+        "occupation": "救援队长",
+        "background": "山地救援队队长，应急能力出众"
+    },
+    {
+        "name": "华四六",
+        "age": 30,
+        "occupation": "密码专家",
+        "background": "网络安全专家，精通各种密码技术"
+    },
+    {
+        "name": "金四七",
+        "age": 36,
+        "occupation": "考古学家",
+        "background": "探险家，在各种极端环境下都有工作经验"
+    },
+    {
+        "name": "魏四八",
+        "age": 29,
+        "occupation": "特种兵教官",
+        "background": "特种部队格斗教官，作战经验丰富"
+    },
+    {
+        "name": "叶四九",
+        "age": 31,
+        "occupation": "生存专家",
+        "background": "特种部队生存教官，全能型选手"
+    }
+] 
