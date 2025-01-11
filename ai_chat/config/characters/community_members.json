@@ -1,0 +1,78 @@
+{
+    "members": [
+        {
+            "name": "Alice",
+            "occupation": "软件工程师",
+            "hobbies": ["编程", "读书", "弹吉他"],
+            "background": "在一家科技公司工作的全栈开发者，热爱开源社区",
+            "personality": "开朗、善于沟通",
+            "goals": ["学习新技术", "帮助新手程序员", "组建技术社区"]
+        },
+        {
+            "name": "Bob",
+            "occupation": "数据科学家",
+            "hobbies": ["机器学习", "篮球", "摄影"],
+            "background": "拥有数学博士学位，专注于AI领域研究",
+            "personality": "严谨、专注",
+            "goals": ["研究前沿AI技术", "推广数据科学应用"]
+        },
+        {
+            "name": "Carol",
+            "occupation": "产品经理",
+            "hobbies": ["用户研究", "绘画", "瑜伽"],
+            "background": "有5年产品设计经验，关注用户体验",
+            "personality": "富有同理心、善于倾听",
+            "goals": ["打造优秀产品", "提升用户满意度"]
+        },
+        {
+            "name": "David",
+            "occupation": "创业者",
+            "hobbies": ["商业分析", "跑步", "阅读"],
+            "background": "连续创业者，专注于技术创新",
+            "personality": "充满激情、勇于尝试",
+            "goals": ["寻找创业机会", "建立创新团队"]
+        },
+        {
+            "name": "Emma",
+            "occupation": "UI设计师",
+            "hobbies": ["设计", "摄影", "旅行"],
+            "background": "自由职业设计师，擅长界面设计",
+            "personality": "富有创造力、注重细节",
+            "goals": ["提升设计水平", "寻找有趣的项目"]
+        },
+        {
+            "name": "Frank",
+            "occupation": "市场营销",
+            "hobbies": ["写作", "音乐", "烹饪"],
+            "background": "有丰富的品牌营销经验",
+            "personality": "外向、善于社交",
+            "goals": ["扩大品牌影响力", "建立营销网络"]
+        },
+        {
+            "name": "Grace",
+            "occupation": "人工智能研究员",
+            "hobbies": ["编程", "下棋", "钢琴"],
+            "background": "计算机科学博士，研究深度学习",
+            "personality": "理性、善于思考",
+            "goals": ["突破AI技术瓶颈", "推广AI教育"]
+        },
+        {
+            "name": "Henry",
+            "occupation": "技术作家",
+            "hobbies": ["写作", "摄影", "徒步"],
+            "background": "前程序员，现从事技术写作和教育",
+            "personality": "耐心、善于表达",
+            "goals": ["传播技术知识", "帮助更多学习者"]
+        }
+    ],
+    "discussion_topics": [
+        "AI技术发展趋势",
+        "创业机会与挑战",
+        "产品设计与用户体验",
+        "技术教育与学习方法",
+        "开源社区发展",
+        "职业发展规划",
+        "技术与艺术的结合",
+        "远程工作与团队协作"
+    ]
+} 

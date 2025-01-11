@@ -21,3 +21,19 @@ trade/
 │   ├── __init__.py
 │   └── commands.py         # CLI命令定义
 └── main.py                 # 主入口文件 
+
+ai_chat/
+    ├── models/
+    │   ├── __init__.py
+    │   ├── character.py      # 角色模型定义
+    │   └── chat_history.py   # 聊天历史记录模型
+    ├── core/
+    │   ├── __init__.py
+    │   ├── chat_manager.py   # 聊天管理器
+    │   ├── ollama_client.py  # Ollama API 客户端
+    │   └── context_builder.py # 上下文构建器
+    ├── config/
+    │   ├── __init__.py
+    │   └── characters/       # 角色配置文件目录
+    │       └── default_characters.json
+    └── main.py              # 主程序入口 
