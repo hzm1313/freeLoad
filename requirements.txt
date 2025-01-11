@@ -27,5 +27,29 @@ python-dateutil>=2.8.2
 # 类型提示支持
 typing-extensions>=3.10.0
 
-# 进度条（可选，用于显示进度）
-tqdm>=4.62.0 
+# PDF处理
+PyPDF2>=3.0.0
+
+# 进度条显示
+tqdm>=4.62.0
+
+# JSON处理
+json5>=0.9.6
+
+# 文件和IO操作
+python-magic>=0.4.24  # 用于文件类型检测
+chardet>=4.0.0  # 用于字符编码检测
+
+# 日志处理
+colorlog>=6.7.0  # 用于彩色日志输出
+
+# 网络代理支持
+PySocks>=1.7.1
+
+# 数据可视化（可选）
+matplotlib>=3.4.3
+seaborn>=0.11.2
+
+# 测试工具（开发用）
+pytest>=6.2.5
+pytest-cov>=2.12.1 

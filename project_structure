@@ -1,0 +1,23 @@
+trade/
+├── config/
+│   ├── __init__.py
+│   └── settings.py          # 配置文件
+├── core/
+│   ├── __init__.py
+│   ├── data_fetcher.py      # 数据获取模块
+│   ├── lstm_predictor.py    # LSTM预测模块
+│   ├── turtle_strategy.py   # 海龟策略模块
+│   ├── sentiment_analyzer.py # 热点分析模块
+│   └── ai_analyzer.py       # AI分析模块
+├── utils/
+│   ├── __init__.py
+│   ├── logger.py           # 日志工具
+│   ├── excel_writer.py     # Excel输出工具
+│   └── data_processor.py   # 数据处理工具
+├── models/
+│   ├── __init__.py
+│   └── entities.py         # 数据模型定义
+├── cli/
+│   ├── __init__.py
+│   └── commands.py         # CLI命令定义
+└── main.py                 # 主入口文件 
