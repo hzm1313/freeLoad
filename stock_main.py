@@ -229,18 +229,29 @@ def display_analysis_summary(stock_code: str, predictions, signals, sentiment, r
 
 #雅虎财经 https://finance.yahoo.com/quote/159740.SZ/
 if __name__ == "__main__":
-    # 使用 sys.argv 来模拟命令行参数
-    sys.argv = [
-        sys.argv[0],
-        "analyze",
-        "159740.SZ",
-        # "159740.SH",
-        "--period", "6mo",
-        "--interval", "1d",
-        "--predict-days", "5",
-        "--analysis-type", "turtle",
-        # "--analysis-type", "all",
-        # "--analysis-type", "financial",
-        # "--report-url", "https://www.apple.com.cn/newsroom/pdfs/fy2024-q4/FY24_Q4_Consolidated_Financial_Statements.pdf"
-    ]
-    cli()
+    # 添加调试信息
+    print("程序开始运行...")
+    
+    try:
+        # 使用 sys.argv 来模拟命令行参数
+        sys.argv = [
+            sys.argv[0],
+            "analyze",
+            "159740.SZ",
+            "--period", "6mo",
+            "--interval", "1d",
+            "--predict-days", "5",
+            "--analysis-type", "turtle",
+        ]
+        print(f"命令行参数: {sys.argv}")
+        
+        # 添加调试信息
+        print("开始执行 cli()...")
+        cli()
+        print("程序执行完成")
+        
+    except Exception as e:
+        print(f"发生错误: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
+        sys.exit(1)

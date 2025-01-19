@@ -7,11 +7,14 @@ from typing import List, Optional
 from trade.config.settings import Settings
 from trade.models.entities import StockData
 from trade.utils.logger import Logger
+import os
 
 class DataFetcher:
     def __init__(self):
         self.logger = Logger()
         self.session = self._create_session()
+        self.local_data_dir = Path("trade/data/stocks")
+        self.local_data_dir.mkdir(parents=True, exist_ok=True)
         
     def _create_session(self) -> requests.Session:
         """创建请求会话"""
@@ -28,18 +31,60 @@ class DataFetcher:
                         end_date: Optional[datetime] = None,
                         period: str = "3mo",
                         interval: str = "1d") -> StockData:
-        """获取股票数据"""
+        """获取股票数据，优先从本地读取"""
         try:
-            ticker = yf.Ticker(stock_code)
-            data = ticker.history(start=start_date, end=end_date, 
-                                period=period, interval=interval)
+            # 检查本地文件
+            local_file = self.local_data_dir / f"{stock_code}.xlsx"
+            if local_file.exists():
+                self.logger.info(f"从本地读取{stock_code}数据")
+                try:
+                    data = pd.read_excel(local_file, index_col=0, parse_dates=True)
+                    
+                    # 检查数据是否需要更新
+                    if not data.empty:
+                        last_date = data.index[-1]
+                        today = datetime.now().date()
+                        
+                        # 如果最后一条数据不是今天的，且是交易时间，则更新数据
+                        if last_date.date() < today and self._is_trading_hours():
+                            self.logger.info(f"本地数据需要更新: {stock_code}")
+                            new_data = self._fetch_from_yfinance(stock_code, 
+                                                               start_date=last_date + timedelta(days=1),
+                                                               end_date=end_date,
+                                                               period=period,
+                                                               interval=interval)
+                            if not new_data.empty:
+                                # 合并新旧数据
+                                data = pd.concat([data, new_data])
+                                data = data[~data.index.duplicated(keep='last')]
+                                # 保存更新后的数据
+                                data.to_excel(local_file)
+                        
+                        return StockData(
+                            code=stock_code,
+                            name=self.get_stock_name(stock_code),
+                            data=data,
+                            last_update=datetime.now()
+                        )
+                except Exception as e:
+                    self.logger.error(f"读取本地文件失败: {str(e)}")
+                    # 如果本地文件读取失败，删除可能损坏的文件
+                    local_file.unlink(missing_ok=True)
             
-            if data.empty:
-                raise ValueError(f"No data retrieved for stock {stock_code}")
+            # 如果本地文件不存在或读取失败，从网络获取
+            self.logger.info(f"从网络获取{stock_code}数据")
+            data = self._fetch_from_yfinance(stock_code, start_date, end_date, period, interval)
+            
+            # 保存到本地
+            if not data.empty:
+                try:
+                    data.to_excel(local_file)
+                except Exception as e:
+                    self.logger.error(f"保存到本地失败: {str(e)}")
             
             return StockData(
                 code=stock_code,
-                name=ticker.info.get('shortName', stock_code),
+                name=self.get_stock_name(stock_code),
                 data=data,
                 last_update=datetime.now()
             )
@@ -47,6 +92,31 @@ class DataFetcher:
         except Exception as e:
             self.logger.error(f"Error fetching data for {stock_code}: {str(e)}")
             raise
+    
+    def _fetch_from_yfinance(self, stock_code: str,
+                            start_date: Optional[datetime] = None,
+                            end_date: Optional[datetime] = None,
+                            period: str = "3mo",
+                            interval: str = "1d") -> pd.DataFrame:
+        """从 yfinance 获取数据并移除时区信息"""
+        ticker = yf.Ticker(stock_code)
+        data = ticker.history(start=start_date, end=end_date, 
+                            period=period, interval=interval)
+        
+        # 移除时区信息
+        data.index = data.index.tz_localize(None)
+        return data
+    
+    def _is_trading_hours(self) -> bool:
+        """检查当前是否是交易时间"""
+        now = datetime.now()
+        # 周一到周五
+        if now.weekday() < 5:
+            # 9:30 - 15:00 交易时间 (简化处理，实际可能需要考虑不同市场)
+            current_time = now.time()
+            return (current_time >= datetime.strptime("09:30", "%H:%M").time() and 
+                    current_time <= datetime.strptime("15:00", "%H:%M").time())
+        return False
     
     def fetch_multiple_stocks(self, stock_codes: List[str], 
                             start_date: Optional[datetime] = None,
