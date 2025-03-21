@@ -23,6 +23,10 @@ class TurtleStrategy:
         self.logger = Logger()
         self.data_processor = DataProcessor()
         self.config = Settings.TURTLE
+        self.current_position = 0  # 当前持仓量
+        self.cash = 1000000  # 初始资金，可以从配置中读取
+        self.positions = []  # 记录持仓历史
+        self.portfolio_values = []  # 记录组合价值历史
         
     def analyze(self, stock_data: StockData) -> List[TradeSignal]:
         """
@@ -142,7 +146,7 @@ class TurtleStrategy:
             确保单次交易的风险不超过账户总值的固定比例
         """
         dollar_volatility = atr
-        position_size = (self.config.total_risk_capital * 
+        position_size = (self.config.total_risk_capital *
                         self.config.risk_percentage) / dollar_volatility
         return position_size
     

@@ -7,7 +7,6 @@ from typing import List, Optional
 from trade.config.settings import Settings
 from trade.models.entities import StockData
 from trade.utils.logger import Logger
-import os
 
 class DataFetcher:
     def __init__(self):
@@ -33,10 +32,10 @@ class DataFetcher:
                         interval: str = "1d") -> StockData:
         """获取股票数据，优先从本地读取"""
         try:
-            # 检查本地文件
-            local_file = self.local_data_dir / f"{stock_code}.xlsx"
+            # 修改本地文件名格式，加入period和interval
+            local_file = self.local_data_dir / f"{stock_code}_{period}_{interval}.xlsx"
             if local_file.exists():
-                self.logger.info(f"从本地读取{stock_code}数据")
+                self.logger.info(f"从本地读取{stock_code}数据 (周期:{period}, 间隔:{interval})")
                 try:
                     data = pd.read_excel(local_file, index_col=0, parse_dates=True)
                     
@@ -100,11 +99,12 @@ class DataFetcher:
                             interval: str = "1d") -> pd.DataFrame:
         """从 yfinance 获取数据并移除时区信息"""
         ticker = yf.Ticker(stock_code)
-        data = ticker.history(start=start_date, end=end_date, 
+        data = ticker.history(start=start_date, end=end_date,
                             period=period, interval=interval)
         
         # 移除时区信息
-        data.index = data.index.tz_localize(None)
+        if data.index.tz is not None:
+            data.index = data.index.tz_localize(None)
         return data
     
     def _is_trading_hours(self) -> bool:
@@ -185,9 +185,9 @@ class DataFetcher:
             StockData: 股票数据对象
         """
         try:
-            # 如果是增量模式，先检查本地缓存
+            # 修改缓存文件名格式，加入period和interval
             if mode == 'incremental' and cache_dir:
-                cache_file = cache_dir / f"{stock_code}_data.parquet"
+                cache_file = cache_dir / f"{stock_code}_{period}_{interval}_data.parquet"
                 if cache_file.exists():
                     # 读取缓存数据
                     cached_data = pd.read_parquet(cache_file)
@@ -241,7 +241,7 @@ class DataFetcher:
             # 如果指定了缓存目录，保存数据
             if cache_dir:
                 cache_dir.mkdir(parents=True, exist_ok=True)
-                cache_file = cache_dir / f"{stock_code}_data.parquet"
+                cache_file = cache_dir / f"{stock_code}_{period}_{interval}_data.parquet"
                 stock_data.data.to_parquet(cache_file)
             
             return stock_data

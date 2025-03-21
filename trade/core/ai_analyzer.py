@@ -19,7 +19,8 @@ class AIAnalyzer:
         try:
             # 准备分析数据
             analysis_data = self._prepare_analysis_data(stock_data)
-            
+            print(analysis_data)
+
             # 根据配置选择AI模型
             if self.config.model_type == "ollama":
                 analysis_result = self._analyze_with_ollama(analysis_data)
@@ -56,7 +57,7 @@ class AIAnalyzer:
     def _analyze_with_ollama(self, data: Dict) -> Dict:
         """使用Ollama模型进行分析"""
         prompt = self._generate_analysis_prompt(data)
-        
+        print("[请求模型的 prompt]", prompt)
         try:
             response = requests.post(
                 "http://localhost:11434/api/generate",
@@ -143,4 +144,9 @@ class AIAnalyzer:
             opportunities=analysis_result['opportunities'],
             threats=analysis_result['threats'],
             recommendation=analysis_result['recommendation']
-        ) 
+        )
+
+
+# 你对一个短线交易的专家，尤其擅长波动操作，现在需要你进行明天的股价变化
+# 你是一个擅长金融新闻分析和热点分析的专家，我给你提供你最新的公司新闻和股吧讨论信息，需要你预测明天的股票涨跌
+# 你是一个六爻的专家，我提供你时间，股票代码，股票名称，预测明天股票的涨跌

@@ -4,11 +4,15 @@ from trade.config.settings import Settings
 from typing import List
 import sys
 from pathlib import Path
+
+from trade.core.backtest_engine import BacktestEngine
 from trade.core.data_fetcher import DataFetcher
 import click.core
 from datetime import datetime
 import os
 import numpy as np
+
+from trade.utils.data_processor import DataProcessor
 
 # 设置代理
 os.environ['https_proxy'] = 'http://127.0.0.1:7890'
@@ -28,7 +32,7 @@ def cli():
 @click.option('--interval', default='1d', help='数据间隔: 1m/2m/5m/15m/30m/60m/90m/1h/1d/5d/1wk/1mo/3mo')
 @click.option('--predict-days', default=5, help='预测天数')
 @click.option('--analysis-type',
-              type=click.Choice(['all', 'predict', 'turtle', 'sentiment', 'ai', 'financial']),
+              type=click.Choice(['all', 'predict', 'turtle', 'sentiment', 'ai', 'financial', 'showData']),
               default='all',
               help='分析类型:全部/预测/海龟/情绪/AI/财报')
 @click.option('--report-url', help='财报PDF的URL（仅在分析类型为financial时需要）')
@@ -70,8 +74,36 @@ def analyze(stock_codes: List[str], period: str, interval: str, predict_days: in
             click.echo(f"分析股票 {stock_code} ({idx}/{total_stocks})")
             click.echo(f"{'='*50}")
             
-            predictions = signals = sentiment = report = financial_analysis = None
-            
+            predictions = signals = sentiment = report = financial_analysis = backtest_results = None
+
+            if analysis_type in ['all', 'showData']:
+                click.echo("\n🔮 获取数据")
+                processor = DataProcessor()
+                processed_data = processor.calculate_technical_indicators(stock_data)
+
+                print(processed_data)
+
+                last_row = processed_data.iloc[-1].to_dict()
+
+                # 格式化数据（处理numpy类型和日期）
+                formatted_data = {}
+                for key, value in last_row.items():
+                    if isinstance(value, np.float64):
+                        formatted_data[key] = float(value)
+                    elif isinstance(value, np.int64):
+                        formatted_data[key] = int(value)
+                    elif isinstance(value, datetime):
+                        formatted_data[key] = value.strftime('%Y-%m-%d %H:%M:%S')
+                    else:
+                        formatted_data[key] = value
+
+                # 使用JSON格式美化输出
+                import json
+                click.echo("\n📊 最新一条数据:"+ f'{stock_codes} code:')
+                click.echo(json.dumps(formatted_data, indent=2, ensure_ascii=False))
+                click.echo("✅ 获取数据展示完成")
+                click.echo("✅ 获取数据展示完成")
+
             if analysis_type in ['all', 'predict']:
                 click.echo("\n🔮 执行预测分析...")
                 cli.lstm_predictor.train(stock_data)
@@ -83,6 +115,13 @@ def analyze(stock_codes: List[str], period: str, interval: str, predict_days: in
                 signals = cli.turtle_strategy.analyze(stock_data)
                 click.echo("✅ 海龟策略分析完成")
 
+                # 修改：直接使用原始数据，通过过滤时间来创建新的数据框
+                filtered_data = stock_data
+                filtered_data.data = filtered_data.data[filtered_data.data.index <'2024-01-01']
+                
+                # 在analyze方法中调用回测
+                backtest_engine = BacktestEngine(initial_capital=1000000)
+                backtest_results = backtest_engine.run_backtest(stock_data, cli.turtle_strategy)
             if analysis_type in ['all', 'sentiment']:
                 click.echo("\n😊 执行情绪分析...")
                 sentiment = cli.sentiment_analyzer.analyze(stock_data)
@@ -108,7 +147,8 @@ def analyze(stock_codes: List[str], period: str, interval: str, predict_days: in
                 signals, 
                 sentiment, 
                 report,
-                financial_analysis
+                financial_analysis,
+                backtest_results
             )
 
             # 如果是 'all' 类型，直接保存已经计算的结果
@@ -131,7 +171,7 @@ def analyze(stock_codes: List[str], period: str, interval: str, predict_days: in
         click.echo(f"\n❌ 发生错误: {str(e)}")
         sys.exit(1)
 
-def display_analysis_summary(stock_code: str, predictions, signals, sentiment, report, financial_analysis=None):
+def display_analysis_summary(stock_code: str, predictions, signals, sentiment, report, financial_analysis=None, backtest_results=None):
     """展示分析结果汇总"""
     click.echo("\n" + "="*50)
     click.echo(f"📊 {stock_code} 分析结果汇总")
@@ -174,6 +214,17 @@ def display_analysis_summary(stock_code: str, predictions, signals, sentiment, r
                 click.echo(f"- 最新交易信号: {action_map.get(latest_signal.action, '无信号')}")
                 click.echo(f"- 交易价格: {latest_signal.price:.2f}")
                 click.echo(f"- 信号原因: {latest_signal.reason}")
+                
+                # 添加回测结果显示
+                click.echo("\n📊 策略回测结果:")
+                results = backtest_results
+                click.echo(f"- 总收益率: {results['total_return']:.2%}")
+                click.echo(f"- 年化收益率: {results['annual_return']:.2%}")
+                click.echo(f"- 夏普比率: {results['sharpe_ratio']:.2f}")
+                click.echo(f"- 最大回撤: {results['max_drawdown']:.2%}")
+                click.echo(f"- 总交易次数: {results['total_trades']}")
+                click.echo(f"- 胜率: {results['win_rate']:.2%}")
+                click.echo(f"- 最终资金: ¥{results['final_value']:,.2f}")
             else:
                 click.echo("- 无交易信号")
         except Exception as e:
@@ -237,11 +288,15 @@ if __name__ == "__main__":
         sys.argv = [
             sys.argv[0],
             "analyze",
-            "159740.SZ",
-            "--period", "6mo",
+            # "AAPL",
+            #"159740.SZ",
+            #"515100.SS",
+            "513130.SS", # 恒生科技etf
+            "510310.SS", # 沪深300 etf
+            "--period", "max",
             "--interval", "1d",
             "--predict-days", "5",
-            "--analysis-type", "turtle",
+            "--analysis-type", "showData",
         ]
         print(f"命令行参数: {sys.argv}")
         
